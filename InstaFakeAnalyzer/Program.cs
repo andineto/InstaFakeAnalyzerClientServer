@@ -38,10 +38,11 @@ public class Program
 
         builder.Services.AddScoped<Service>();
 
-        builder.Services.AddHttpClient<DeepSeekService>(client =>
+        builder.Services.AddHttpClient<GeminiService>(client =>
         {
             client.BaseAddress = new Uri(apiUrl?.ToString());
         });
+
 
         builder.Services.AddCors(options =>
         {

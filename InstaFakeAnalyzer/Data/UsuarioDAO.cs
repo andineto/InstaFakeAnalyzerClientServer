@@ -44,7 +44,7 @@ namespace InstaFakeAnalyzer.Data
                 {
                     return new Usuario()
                     {
-                        Id = reader.GetInt32("Id"),
+                        Id = reader.GetInt32("id"),
                         Nome = reader.GetString("nome"),
                         NomeUsuario = reader.GetString("nomeusuario"),
                         Senha = reader.GetString("senha"),

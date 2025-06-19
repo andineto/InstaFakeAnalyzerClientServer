@@ -51,7 +51,7 @@ namespace InstaFakeAnalyzer.Controllers
         [HttpGet ("verificar")]
         public async Task<ActionResult> GetNoticiasNaoVerificadas()
         {
-            var noticias = _service.ObterNoticiasNaoVerificadas();
+            var noticias = await _service.ObterNoticiasNaoVerificadas();
             return Ok(noticias);
         }
 

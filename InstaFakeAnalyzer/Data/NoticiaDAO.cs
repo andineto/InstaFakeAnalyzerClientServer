@@ -46,9 +46,9 @@ namespace InstaFakeAnalyzer.Data
             SELECT
                 fake
                 , conteudo
-                , verificada
+                , verificado
                 , justificativa
-            FROM noticias
+            FROM mensagem
             WHERE tipo = 1
             ";
             using var command = new MySqlCommand(sql, tran.Connection, tran);
@@ -68,20 +68,21 @@ namespace InstaFakeAnalyzer.Data
             return noticias;
         }
         public static async Task<Noticia> ObterNoticiaPorMd5(string md5, MySqlTransaction tran)
-        { 
-            Noticia noticia = new Noticia();
+        {
+            Noticia noticia = null;
             string sql =
             @"
             SELECT
                 fake
                 , conteudo
-                , verificada
+                , verificado
                 , justificativa
-            FROM noticias
+            FROM mensagem
             WHERE tipo = 1
             AND md5 = @md5
         ";
             using var command = new MySqlCommand(sql, tran.Connection, tran);
+            command.Parameters.AddWithValue("@md5", md5);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync()) {
 
@@ -107,11 +108,11 @@ namespace InstaFakeAnalyzer.Data
             SELECT
                 fake
                 , conteudo
-                , verificada
+                , verificado
                 , justificativa
-            FROM noticias
+            FROM mensagem
             WHERE tipo = 1
-            AND verificada = 0
+            AND verificado = 0
             ";
             using var command = new MySqlCommand(sql, tran.Connection, tran);
             using var reader = await command.ExecuteReaderAsync();
@@ -145,7 +146,7 @@ namespace InstaFakeAnalyzer.Data
             using var command = new MySqlCommand(sql, tran.Connection, tran);
             command.Parameters.AddWithValue("@fake", noticia.snFalsa ? 1 : 0);
             command.Parameters.AddWithValue("@conteudo", noticia.Conteudo ?? string.Empty);
-            command.Parameters.AddWithValue("@verificada", noticia.snAnalizada ? 1 : 0);
+            command.Parameters.AddWithValue("@verificado", noticia.snAnalizada ? 1 : 0);
             command.Parameters.AddWithValue("@md5", noticia.Md5 ?? string.Empty);
             command.Parameters.AddWithValue("@justificativa", noticia.Justificativa ?? string.Empty);
             command.Parameters.AddWithValue("@tipo", noticia.Tipo);

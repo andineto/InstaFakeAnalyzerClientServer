@@ -68,15 +68,9 @@ namespace InstaFakeAnalyzerClient.ApiServices
             return null;
         }
 
-        public async Task<Noticia> AtualizarNoticiaAsync(Noticia noticia)
+        public async Task AtualizarNoticiaAsync(Noticia noticia)
         {
-            var response = await _httpClient.PutAsJsonAsync(api, noticia);
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<Noticia>();
-                return result;
-            }
-            return null;
+            await _httpClient.PutAsJsonAsync(api, noticia);
         }
     }
 }

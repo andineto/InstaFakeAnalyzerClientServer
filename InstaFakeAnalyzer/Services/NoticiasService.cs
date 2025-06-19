@@ -62,10 +62,8 @@ namespace InstaFakeAnalyzer.Services
                     // Se já existe, não insere novamente
                     return;
                 }
-                await DAO.InserirNoticia(noticiaVerificada, Transaction);
+                await DAO.InserirNoticia(noticia, Transaction);
                 await CommitAsync();
-
-
             }
             catch (Exception ex)
             {
@@ -80,6 +78,7 @@ namespace InstaFakeAnalyzer.Services
         {
             try
             {
+                await BeginTransactionAsync();
                 return await DAO.ObterNoticiasNaoVerificadas(Transaction);
             }
             catch (Exception ex)
@@ -92,6 +91,7 @@ namespace InstaFakeAnalyzer.Services
         {
             try
             {
+                await BeginTransactionAsync();
                 return await DAO.ObterNoticiasTodas(Transaction);
             }
             catch (Exception ex)
@@ -104,6 +104,7 @@ namespace InstaFakeAnalyzer.Services
         {
             try
             {
+                await BeginTransactionAsync();
                 return await DAO.ObterNoticiaPorMd5(md5, Transaction);
             }
             catch (Exception ex)
@@ -168,7 +169,7 @@ namespace InstaFakeAnalyzer.Services
                 "{ \"text\": \"Justificativa da análise em português.\", \"fake\": true }\n\n" +
                 $"Noticia a ser analisada: {noticia.Conteudo}";
 
-            var resultado = await _deepSeekService.AnalisarNoticiaAsync(prompt);
+            var resultado = await _geminiService.AnalisarNoticiaAsync(prompt);
             return new Noticia
             {
                 Conteudo = noticia.Conteudo,

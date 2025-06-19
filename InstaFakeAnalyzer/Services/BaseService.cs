@@ -8,12 +8,12 @@ namespace InstaFakeAnalyzer.Services
         protected MySqlConnection Connection => _session.Connection;
         protected MySqlTransaction? Transaction => _session.Transaction;
         private readonly IDbSession _session;
-        private readonly DeepSeekService _deepSeekService;
+        private readonly GeminiService _geminiService;
 
 
-        public Service(DeepSeekService deepSeekService)
+        public Service(GeminiService geminiService)
         {
-            _deepSeekService = deepSeekService ?? throw new ArgumentNullException(nameof(deepSeekService));
+            _geminiService = geminiService ?? throw new ArgumentNullException(nameof(geminiService));
             if (string.IsNullOrWhiteSpace(Program.connectionStringMySql))
             {
                 throw new InvalidOperationException("Connection string não configurada");

@@ -22,7 +22,7 @@ namespace InstaFakeAnalyzer.Services
             _configuration = configuration;
         }
 
-        public async Task<DeepSeekResponse> AnalisarNoticiaAsync(string prompt)
+        public async Task<GeminiResponse> AnalisarNoticiaAsync(string prompt)
         {
             var apiKey = _configuration["DEEPSEEK_APIKEY"];
             var baseUrl = _configuration["DEEPSEEK_BASE_URL"];
@@ -85,7 +85,7 @@ namespace InstaFakeAnalyzer.Services
 
                 try
                 {
-                    var resultado = JsonSerializer.Deserialize<DeepSeekResponse>(jsonClean);
+                    var resultado = JsonSerializer.Deserialize<GeminiResponse>(jsonClean);
                     if (resultado == null)
                         throw new Exception("Falha ao desserializar JSON extraído.");
                     Console.WriteLine(jsonClean);
@@ -106,7 +106,7 @@ namespace InstaFakeAnalyzer.Services
             finally{
                 Console.WriteLine("Exception tratada");
             }
-            return new DeepSeekResponse() { text = null, fake = true };
+            return new GeminiResponse() { text = null, fake = true };
         }
         
     }

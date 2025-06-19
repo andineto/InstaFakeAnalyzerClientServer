@@ -84,7 +84,7 @@ namespace InstaFakeAnalyzerClient.ViewModel
             {
                 IsLoading = true;
                 RespostaIA = "Aguarde, estamos processando sua solicitação...";
-                _noticiaRetornada = await _noticiaService.EnviarNoticiaAsync(new Noticia { Conteudo = NoticiaInput });
+                _noticiaRetornada = await _noticiaService.EnviarNoticiaAsync(new Noticia { Conteudo = NoticiaInput, snFalsa = false, snAnalizada = false });
 
                 if (_noticiaRetornada != null)
                 {

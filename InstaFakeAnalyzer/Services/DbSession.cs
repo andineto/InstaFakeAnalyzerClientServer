@@ -18,7 +18,8 @@ namespace InstaFakeAnalyzer.Services
 
         public async Task BeginTransactionAsync()
         {
-            Transaction = await Connection.BeginTransactionAsync();
+            if (Transaction == null)
+                Transaction = await Connection.BeginTransactionAsync();
         }
 
         public async Task CommitAsync()

@@ -38,7 +38,8 @@ namespace InstaFakeAnalyzer.Services
             }
             try
             {
-                return await DAO.ObterUsuarioByNomeUsuario(nomeUsuario, Transaction!);
+                await BeginTransactionAsync();
+                return await DAO.ObterUsuarioByNomeUsuario(nomeUsuario, Transaction);
             }
             catch (Exception ex)
             {
@@ -49,13 +50,14 @@ namespace InstaFakeAnalyzer.Services
 
         internal async Task<Usuario> FazerLogin(Usuario user)
         {
+            await BeginTransactionAsync();
             var usuarioCadastrado = await ObterUsuarioByNomeUsuario(user.NomeUsuario);
             var senhaMd5 = MD5.Md5Hash(user.Senha);
             if (usuarioCadastrado == null || usuarioCadastrado.Senha != senhaMd5)
             {
                 throw new Exception("Nome de usuario ou senha inválidos");
             }
-            Sessao.Iniciar(user);
+            Sessao.Iniciar(usuarioCadastrado);
             return usuarioCadastrado;
         }
     }
