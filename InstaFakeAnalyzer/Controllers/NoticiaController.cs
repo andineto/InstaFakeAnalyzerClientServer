@@ -11,57 +11,37 @@ namespace InstaFakeAnalyzer.Controllers
     [Route("api/[controller]")]
     public class NoticiaController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly NoticiasService _noticiasService;
+        private readonly Service _service;
 
 
-        public NoticiaController(AppDbContext context, NoticiasService noticiasService)
+        public NoticiaController(Service noticiasService)
         {
             Console.WriteLine("Constructor chamado NoticiasController");
-            _context = context;
-            _noticiasService = noticiasService;
+            _service = noticiasService;
         }
+
+        
 
         [HttpPost]
         public async Task<IActionResult> PostNoticia([FromBody] Noticia noticia)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            Noticia noticiaVerificada = await _context.Noticia
-                .FirstOrDefaultAsync(n => n.Conteudo == noticia.Conteudo);
-
-            if (noticiaVerificada != null)
-            {
-                // Se já existe, retorna ela sem reprocessar
-                return Ok(noticiaVerificada);
-            }
-
-            noticiaVerificada = await _noticiasService.ProcessaNoticia(noticia);
-
-            if (string.IsNullOrWhiteSpace(noticiaVerificada.Justificativa))
-            {
-                noticiaVerificada.Justificativa = "Não obtivemos nenhuma resposta, tente novamente.";
-                return Ok(noticiaVerificada);
-            }
-
-            _context.Noticia.Add(noticiaVerificada);
-            await _context.SaveChangesAsync();
-
+            Noticia noticiaVerificada = await _service.InserirNoticia(noticia);
             return Ok(noticiaVerificada);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetNoticias()
         {
-            var noticias = await _context.Noticia.ToListAsync();
+            var noticias = _service.ObterNoticiasTodas();
             return Ok(noticias);
         }
 
         [HttpGet ("{id}")]
-        public async Task<IActionResult> GetNoticiaById(int id)
+        public async Task<IActionResult> GetNoticiaByMd5(string md5)
         {
-            var noticia = await _context.Noticia.FindAsync(id);
+            var noticia = await _service.ObterNoticiaPorMd5(md5);
             if (noticia == null)
             {
                 return NotFound();
@@ -71,7 +51,7 @@ namespace InstaFakeAnalyzer.Controllers
         [HttpGet ("verificar")]
         public async Task<ActionResult> GetNoticiasNaoVerificadas()
         {
-            var noticias = await _context.Noticia.Where(n => n.snAnalizada == false).ToListAsync();
+            var noticias = _service.ObterNoticiasNaoVerificadas();
             return Ok(noticias);
         }
 
@@ -82,8 +62,7 @@ namespace InstaFakeAnalyzer.Controllers
                 return BadRequest(ModelState);
             try
             {
-                await _context.Noticia.AddAsync(noticia);
-                await _context.SaveChangesAsync();
+                await _service.SalvarNoticiaDiretamente(noticia);
                 return Ok();
             }
             catch(DbException ex)
@@ -99,31 +78,29 @@ namespace InstaFakeAnalyzer.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            var noticiaExistente = await _context.Noticia.FindAsync(noticia.Id);
-            if (noticiaExistente == null)
+            try
             {
-                return NotFound();
+                await _service.AlterarNoticia(noticia);
+                return Ok();
             }
-            noticiaExistente.Conteudo = noticia.Conteudo;
-            noticiaExistente.Justificativa = noticia.Justificativa;
-            noticiaExistente.snFalsa = noticia.snFalsa;
-            noticiaExistente.snAnalizada = noticia.snAnalizada;
-            await _context.SaveChangesAsync();
-            return Ok(noticiaExistente);
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
         }
 
-        [HttpDelete ("{id}")]
-        public async Task<IActionResult> DeleteNoticia(int id)
+        [HttpDelete ("{md5}")]
+        public async Task<IActionResult> DeleteNoticia(string md5)
         {
-            var noticia = await _context.Noticia.FindAsync(id);
-            if (noticia == null)
+            try
             {
-                return NotFound();
+                await _service.ExcluirNoticia(md5);
+                return Ok();
             }
-            _context.Noticia.Remove(noticia);
-            await _context.SaveChangesAsync();
-            return NoContent();
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
         }
     }
 }

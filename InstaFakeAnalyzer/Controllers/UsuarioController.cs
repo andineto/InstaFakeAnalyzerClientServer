@@ -1,5 +1,6 @@
 ﻿using InstaFakeAnalyzer.Data;
 using InstaFakeAnalyzer.Models;
+using InstaFakeAnalyzer.Services;
 using InstaFakeAnalyzer.Utils;
 using InstaFakeAnalyzerClient.Utils;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -12,48 +13,39 @@ namespace InstaFakeAnalyzer.Controllers
     [Route("api/[controller]")]
     public class UsuarioController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        public UsuarioController(AppDbContext context)
+        private readonly Service _service;
+        public UsuarioController(Service service)
         {
-            _context = context;
-        }
-        
-        private async Task<bool> UsuarioJaCadastrado(string NomeUsuario)
-        {
-            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.NomeUsuario == NomeUsuario);
-            return usuario != null;
+            _service = service;
         }
 
         [HttpPost($"cadastrar")]
         public async Task<IActionResult> CadastrarUsuario([FromBody] Usuario usuario)
         {
-            if (await UsuarioJaCadastrado(usuario.NomeUsuario))
+            try
             {
-                return BadRequest(new
-                {
-                    resultado = "Usuário já cadastrado",
-                });
+                usuario.Senha = MD5.Md5Hash(usuario.Senha); // Hash da senha
+                usuario.DataCadastro = DateTime.UtcNow;
+                await _service.InserirUsuario(usuario);
+                return Ok(); // Cadastro bem-sucedido
+            }catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
             }
-            usuario.Senha = MD5.Md5Hash(usuario.Senha); // Hash da senha
-            usuario.DataCadastro = DateTime.UtcNow;
-            _context.Usuario.Add(usuario);
-            await _context.SaveChangesAsync();
-            return Ok(); // Cadastro bem-sucedido
+
         }
 
         [HttpPost($"login")]
         public async Task<IActionResult> FazerLogin([FromBody]Usuario user)
         {
-            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.NomeUsuario == user.NomeUsuario && u.Senha == MD5.Md5Hash(user.Senha));
-            if (usuario != null)
+            try
             {
-                Sessao.Iniciar(usuario); 
-                return Ok(usuario); 
+                var usuario = await _service.FazerLogin(user);
+                return Ok(usuario);
+            }catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
             }
-            return BadRequest(new
-            {
-                resultado = "Login ou senha inválidos"
-            }); // Falha no login
         }
 
         [HttpPost($"logout")]

@@ -1,4 +1,6 @@
-﻿namespace InstaFakeAnalyzerClient.Models
+﻿using InstaFakeAnalyzer.Utils;
+
+namespace InstaFakeAnalyzerClient.Models
 {
     public class Noticia
     {
@@ -8,5 +10,7 @@
         public bool? snFalsa { get; set; }
         public bool? snAnalizada { get; set; }
         public DateTime? DataCadastro { get; set; }
+        public string Md5 => MD5.Md5Hash(Conteudo);
+        public int Tipo = 1;
     }
 }

@@ -103,9 +103,6 @@ public class InstagramWebhookController : ControllerBase
 public async Task EnviarRespostaInstagramAsync(string senderId, string resposta)
     {
         string pageAccessToken = _configuration["ACCESS_TOKEN_FB"];
-#if DEBUG
-        pageAccessToken = _configuration["Facebook:AcessToken"];
-#endif
         using var client = new HttpClient();
 
         var jsonBody = new

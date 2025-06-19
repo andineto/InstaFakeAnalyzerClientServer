@@ -106,7 +106,7 @@ namespace InstaFakeAnalyzer.Services
             finally{
                 Console.WriteLine("Exception tratada");
             }
-            return new DeepSeekResponse() { text = null, fake = null };
+            return new DeepSeekResponse() { text = null, fake = true };
         }
         
     }
