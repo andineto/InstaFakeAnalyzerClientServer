@@ -15,31 +15,22 @@ Este projeto é um chatbot que analisa mensagens recebidas via Instagram Direct 
 
 - C# (.NET)
 - ASP.NET Core Web API
-- Entity Framework Core + Migrations
-- PostgreSQL
-- DeepSeek R1 / OpenRouter
+- MySqlConnector
+- MySql
+- Gemini Api Key
 - Facebook Graph API + Instagram Graph API
 - ngrok (para testes locais de Webhook)
 
 ## 🚀 Como rodar localmente
 
 1. Clone este repositório
-2. Crie o banco de dados PostgreSQL e configure `appsettings.json`
-3. Execute as migrations:
-
-```bash
-dotnet tool install --global dotnet-ef
-dotnet ef migrations add InitialCreate
-dotnet ef database update
-```
-
-4. Inicie o projeto:
+2. Inicie o projeto:
 
 ```bash
 dotnet run
 ```
 
-4.5. Para testar de forma local, com postman, envie uma requisição do tipo post para http://localhost:5170/api/noticias com corpo:
+2.5. Para testar de forma local, com postman, envie uma requisição do tipo post para http://localhost:5170/api/noticias com corpo:
 {
     "Conteudo": "Sua noticia para teste"
 }
